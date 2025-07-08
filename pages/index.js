@@ -1,115 +1,119 @@
+import TodoFooter from "@/components/main/todo_footer";
+import TodoInput from "@/components/main/todo_input";
+import TodoList from "@/components/main/todo_list";
+import Todo from "@/data/model_todo";
+import { useTheme } from "next-themes";
 import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useState } from "react";
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
+  const [todos, setTodos] = useState([
+    new Todo(0, "Let's move to win", false),
+    new Todo(1, "Here let's be Productive", true),
+  ]);
+  const [filter, setFilter] = useState("all");
+
+  const addTodo = (text) => {
+    setTodos([...todos, new Todo(Date.now(), text, false)]);
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.completed));
+  };
+
+  const filteredTodos = todos.filter((todo) =>
+    filter === "all"
+      ? true
+      : filter === "active"
+      ? !todo.completed
+      : todo.completed
+  );
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    // first of all
+    <div className="w-screen h-screen flex flex-col justify-center items-center bg-[#fafafa] dark:bg-[#181824] relative">
+      <div className="absolute top-0">
+        {theme === "dark" ? (
+          <Image
+            src={"/bg-desktop-dark.jpg"}
+            height={100}
+            width={5000}
+            alt="background dark"
+          />
+        ) : (
+          <Image
+            src={"/bg-desktop-light.jpg"}
+            height={100}
+            width={5000}
+            alt="background dark"
+          />
+        )}
+      </div>
+
+      {/* the main container */}
+      <div className="w-[40vw] h-[80vh] absolute flex flex-col gap-4">
+        {/* the first title with theme toggle */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl text-white font-semibold tracking-[13px]">
+            TODO
+          </h1>
+          <div
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="w-10 h-10 flex justify-center items-center cursor-pointer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {theme === "dark" ? (
+              <Image
+                src={"/icon-sun.svg"}
+                height={100}
+                width={30}
+                alt="icon sun"
+              />
+            ) : (
+              <Image
+                src={"/icon-moon.svg"}
+                height={100}
+                width={30}
+                alt="icon sun"
+              />
+            )}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* text input where the text is */}
+        <TodoInput onAddTodo={addTodo} />
+
+        {/* the list of the TODOs */}
+        <div className="w-full bg-[#ffffff] rounded-sm dark:bg-[#25273c] shadow-lg shadow-gray-300 dark:shadow-black">
+          <TodoList
+            Todos={filteredTodos}
+            onToggle={toggleTodo}
+            onDelete={deleteTodo}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <TodoFooter
+            total={todos.filter((todo) => !todo.completed).length}
+            onClear={clearCompleted}
+            onFilter={setFilter}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+
+        {/* little hint */}
+        <p className="text-center text-[0.7rem] mt-4 text-gray-500 font-semibold">
+          Drag and drop to reorder list
+        </p>
+      </div>
     </div>
   );
 }
