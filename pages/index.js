@@ -4,7 +4,7 @@ import TodoList from "@/components/main/todo_list";
 import Todo from "@/data/model_todo";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
@@ -13,6 +13,20 @@ export default function Home() {
     new Todo(1, "Here let's be Productive", true),
   ]);
   const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    const data = localStorage.getItem("todos");
+    if (data) {
+      const parsed = JSON.parse(data);
+      setTodos(
+        parsed.map((todo) => new Todo(todo.id, todo.title, todo.completed))
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
   const addTodo = (text) => {
     setTodos([...todos, new Todo(Date.now(), text, false)]);
@@ -110,9 +124,9 @@ export default function Home() {
         </div>
 
         {/* little hint */}
-        <p className="text-center text-[0.7rem] mt-4 text-gray-500 font-semibold">
+        {/* <p className="text-center text-[0.7rem] mt-4 text-gray-500 font-semibold">
           Drag and drop to reorder list
-        </p>
+        </p> */}
       </div>
     </div>
   );
