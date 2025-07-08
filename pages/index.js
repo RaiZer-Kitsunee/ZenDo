@@ -22,11 +22,16 @@ export default function Home() {
         parsed.map((todo) => new Todo(todo.id, todo.title, todo.completed))
       );
     }
+    const themeData = localStorage.getItem("theme");
+    if (themeData) {
+      setTheme(JSON.parse(themeData));
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    localStorage.setItem("theme", JSON.stringify(theme));
+  }, [todos, theme]);
 
   const addTodo = (text) => {
     setTodos([...todos, new Todo(Date.now(), text, false)]);
