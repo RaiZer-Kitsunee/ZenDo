@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [todos, setTodos] = useState([
     new Todo(0, "Let's move to win", false),
     new Todo(1, "Here let's be Productive", true),
@@ -15,6 +16,7 @@ export default function Home() {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
+    //* here we load todos to local storage
     const data = localStorage.getItem("todos");
     if (data) {
       const parsed = JSON.parse(data);
@@ -22,15 +24,18 @@ export default function Home() {
         parsed.map((todo) => new Todo(todo.id, todo.title, todo.completed))
       );
     }
+    //* and here we load theme
     const themeData = localStorage.getItem("theme");
     if (themeData) {
-      setTheme(JSON.parse(themeData));
+      setTheme(themeData);
     }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
+    //* here we save theme and todos
     localStorage.setItem("todos", JSON.stringify(todos));
-    localStorage.setItem("theme", JSON.stringify(theme));
+    localStorage.setItem("theme", theme);
   }, [todos, theme]);
 
   const addTodo = (text) => {
@@ -61,25 +66,22 @@ export default function Home() {
       : todo.completed
   );
 
+  if (!mounted) {
+    return;
+  }
+
   return (
     // first of all
     <div className="w-screen h-screen flex flex-col justify-center items-center bg-[#fafafa] dark:bg-[#181824] relative">
       <div className="absolute top-0">
-        {theme === "dark" ? (
-          <Image
-            src={"/bg-desktop-dark.jpg"}
-            height={100}
-            width={5000}
-            alt="background dark"
-          />
-        ) : (
-          <Image
-            src={"/bg-desktop-light.jpg"}
-            height={100}
-            width={5000}
-            alt="background dark"
-          />
-        )}
+        <Image
+          src={
+            theme === "dark" ? "/bg-desktop-dark.jpg" : "/bg-desktop-light.jpg"
+          }
+          height={100}
+          width={5000}
+          alt="background dark"
+        />
       </div>
 
       {/* the main container */}
@@ -93,21 +95,12 @@ export default function Home() {
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="w-10 h-10 flex justify-center items-center cursor-pointer"
           >
-            {theme === "dark" ? (
-              <Image
-                src={"/icon-sun.svg"}
-                height={100}
-                width={30}
-                alt="icon sun"
-              />
-            ) : (
-              <Image
-                src={"/icon-moon.svg"}
-                height={100}
-                width={30}
-                alt="icon sun"
-              />
-            )}
+            <Image
+              src={theme === "dark" ? "/icon-sun.svg" : "/icon-moon.svg"}
+              height={100}
+              width={30}
+              alt="icon sun"
+            />
           </div>
         </div>
 
